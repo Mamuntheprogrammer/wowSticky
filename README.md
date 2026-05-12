@@ -2,7 +2,7 @@
 
 **A sticky-note app that follows folders in Windows Explorer.**
 
-WowSticky lives in your system tray and automatically shows notes for whichever folder you're currently browsing in Explorer. Switch to a different folder — your notes switch too.
+WowSticky lives in your system tray and automatically shows notes for whichever folder you're currently browsing in Explorer. Switch to a different folder your notes switch too.
 
 ---
 
@@ -18,7 +18,7 @@ WowSticky lives in your system tray and automatically shows notes for whichever 
 
 | Feature | Description |
 |---|---|---|
-| **Folder-Aware** | Notes are linked to folders — switch folders in Explorer, notes follow |
+| **Folder-Aware** | Notes are linked to folders, switch folders in Explorer, notes follow |
 | **System Tray** | Runs quietly in the notification area; right-click for all controls |
 | **Drag & Resize** | Drag the title bar to move, grab any edge or corner to resize |
 | **Pin & Lock** | Pin to lock position, Lock to make notes read-only |
@@ -139,7 +139,7 @@ Contributions, issues, and feature requests are welcome!
 - **Want a feature?** Start a discussion or open a pull request
 - **Ideas for improvement:** All suggestions welcome
 
-Feel free to fork the repo, make changes, and submit a pull request. Whether it's a bug fix, a new feature, UI polish, or documentation — every contribution helps.
+Feel free to fork the repo, make changes, and submit a pull request. Whether it's a bug fix, a new feature, UI polish, or documentation every contribution helps.
 
 ---
 
