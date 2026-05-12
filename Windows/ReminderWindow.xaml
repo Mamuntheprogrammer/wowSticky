@@ -1,0 +1,92 @@
+<Window x:Class="WowSticky.Windows.ReminderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="True" Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        Width="520" Height="420" ResizeMode="NoResize"
+        Loaded="Window_Loaded" Closing="Window_Closing">
+
+    <Window.Resources>
+        <DropShadowEffect x:Key="Shadow" BlurRadius="36" Opacity="0.45"
+                          ShadowDepth="8" Direction="315" Color="#000000"/>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="Bd" Background="{TemplateBinding Background}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E0000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="16" Padding="1.5" Effect="{StaticResource Shadow}"
+            Background="#30FFFFFF">
+        <Border x:Name="MainBorder" CornerRadius="14.5" Background="White">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border x:Name="HeaderBorder" Grid.Row="0"
+                        CornerRadius="14.5,14.5,0,0" Padding="24,18">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold"
+                                       TextTrimming="CharacterEllipsis" MaxWidth="380"/>
+                            <TextBlock x:Name="MetaText" FontSize="12" Opacity="0.75"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" FontSize="36"
+                                   VerticalAlignment="Center" Margin="0,0,0,4">🔔</TextBlock>
+                    </Grid>
+                </Border>
+
+                <!-- Content -->
+                <ScrollViewer Grid.Row="1" Padding="24,16" VerticalScrollBarVisibility="Auto"
+                              BorderThickness="0">
+                    <TextBlock x:Name="ContentText" FontSize="15" TextWrapping="Wrap"
+                               LineHeight="22"/>
+                </ScrollViewer>
+
+                <!-- Footer -->
+                <Border Grid.Row="2" CornerRadius="0,0,14.5,14.5"
+                        Background="#F0F0F0" Padding="16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="StatusText" FontSize="11" Opacity="0.4"
+                                   VerticalAlignment="Center"
+                                   Text="🔔 Ringing... click Dismiss to stop"/>
+                        <Button x:Name="DismissBtn" Grid.Column="1"
+                                Content="⏹ Dismiss" Padding="18,8"
+                                FontSize="14" FontWeight="SemiBold"
+                                Background="#6366F1" Foreground="White"
+                                Click="Dismiss_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Border>
+</Window>

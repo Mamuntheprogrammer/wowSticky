@@ -63,6 +63,8 @@
                                 Style="{StaticResource NoteButton}" Click="Pin_Click"/>
                         <Button Name="LockBtn" Content="🔒" ToolTip="Lock note"
                                 Style="{StaticResource NoteButton}" Click="Lock_Click"/>
+                        <Button Name="ReminderBtn" Content="🔔" ToolTip="Set reminder"
+                                Style="{StaticResource NoteButton}" Click="Reminder_Click"/>
                     </StackPanel>
 
                      <Grid Grid.Column="1" Margin="4,0">
@@ -108,6 +110,60 @@
                      TextWrapping="Wrap" AcceptsReturn="True"
                      VerticalScrollBarVisibility="Auto"
                      TextChanged="Content_Changed"/>
+
+            <!-- Reminder Panel -->
+            <Border Name="ReminderPanel" Grid.Row="1" Visibility="Collapsed"
+                    Background="White" CornerRadius="10" Padding="14"
+                    VerticalAlignment="Top" Margin="10,8,10,0"
+                    BorderThickness="1.5" BorderBrush="#406366F1"
+                    Effect="{StaticResource ShadowEffect}">
+                <StackPanel>
+                    <TextBlock Text="Set Reminder" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,8"/>
+                    <DatePicker Name="ReminderDatePicker" SelectedDateFormat="Short" Margin="0,2"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+                        <TextBox Name="ReminderHourBox" Text="12" Width="38"
+                                 FontSize="13" Padding="4,2"
+                                 HorizontalContentAlignment="Center"
+                                 MaxLength="2"/>
+                        <TextBlock Text=":" FontSize="16" VerticalAlignment="Center" Margin="3,0"/>
+                        <TextBox Name="ReminderMinuteBox" Text="00" Width="38"
+                                 FontSize="13" Padding="4,2"
+                                 HorizontalContentAlignment="Center"
+                                 MaxLength="2"/>
+                        <ComboBox Name="ReminderAmPmCombo" SelectedIndex="0"
+                                  Width="58" FontSize="13" Margin="6,0,0,0">
+                            <ComboBoxItem>AM</ComboBoxItem>
+                            <ComboBoxItem>PM</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                    <ComboBox Name="ReminderIntervalCombo" Margin="0,4" FontSize="13"
+                              SelectedIndex="0">
+                        <ComboBoxItem Content="Once" Tag="once"/>
+                        <ComboBoxItem Content="Daily" Tag="daily"/>
+                        <ComboBoxItem Content="Monthly (same day)" Tag="monthly"/>
+                        <ComboBoxItem Content="First Day of Month" Tag="firstday"/>
+                        <ComboBoxItem Content="Last Day of Month" Tag="lastday"/>
+                    </ComboBox>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                        <Border CornerRadius="5" Background="#DC4444" Margin="0,0,8,0">
+                            <Button Name="RemoveReminderBtn" Content="✕ Remove"
+                                    Padding="10,5" FontSize="12"
+                                    Foreground="White"
+                                    BorderThickness="0" Cursor="Hand"
+                                    Background="Transparent"
+                                    Click="RemoveReminder_Click"/>
+                        </Border>
+                        <Border CornerRadius="5" Background="#6366F1">
+                            <Button Name="SetReminderBtn" Content="✓ Set Reminder" Padding="12,5"
+                                    FontSize="12" FontWeight="Bold"
+                                    Foreground="White"
+                                    BorderThickness="0" Cursor="Hand"
+                                    Background="Transparent"
+                                    Click="SetReminder_Click"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
             <!-- Footer -->
             <Border Grid.Row="2" Background="#0A000000"

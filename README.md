@@ -17,7 +17,7 @@ WowSticky lives in your system tray and automatically shows notes for whichever 
 ## Features
 
 | Feature | Description |
-|---|---|
+|---|---|---|
 | **Folder-Aware** | Notes are linked to folders — switch folders in Explorer, notes follow |
 | **System Tray** | Runs quietly in the notification area; right-click for all controls |
 | **Drag & Resize** | Drag the title bar to move, grab any edge or corner to resize |
@@ -29,9 +29,35 @@ WowSticky lives in your system tray and automatically shows notes for whichever 
 | **Global Hotkey** | `Ctrl+Shift+W` to show/hide all notes instantly |
 | **Auto-Startup** | Launches automatically with Windows |
 | **Single Instance** | Only one instance runs; double-launch shows existing notes |
+| **Reminders** | Set per-note reminders with date, time, and repeat options |
+| **Notification Popup** | Full-screen reminder popup with ringing sound and note content |
 | **Tutorial** | Step-by-step walkthrough on first run (skippable) |
 
 ---
+
+## Reminders
+
+Each note can have a reminder with flexible scheduling:
+
+- Click the 🔔 button in the note's title bar to open the reminder panel
+- Set a **date**, **time** (hour, minute, AM/PM), and **repeat type**:
+
+| Repeat Type | Behavior |
+|---|---|
+| **Once** | Fires once at the specified date & time |
+| **Daily** | Fires every day at the set time |
+| **Monthly (same day)** | Fires on the same day every month |
+| **First Day of Month** | Fires on the 1st of every month |
+| **Last Day of Month** | Fires on the last day of every month |
+
+When a reminder fires:
+
+- A **popup window** appears centered on screen showing the note's title, content, and source folder
+- A **ringing sound** alternates until dismissed
+- The popup uses the note's color theme for the header
+- Click **Dismiss** to stop the ringing and close the popup
+
+Reminders persist across app restarts and work even when notes are hidden.
 
 ## Tutorial
 
@@ -59,7 +85,7 @@ The tutorial can be skipped at any time.
 
 ### Installer
 
-1. Download `WowSticky-Setup-1.1.exe` from the [Releases](https://github.com/Mamuntheprogrammer/WowSticky/releases) page
+1. Download `WowSticky-Setup-2.0.exe` from the [Releases](https://github.com/Mamuntheprogrammer/WowSticky/releases) page
 2. Run the installer
 3. WowSticky starts automatically and adds itself to Windows startup
 

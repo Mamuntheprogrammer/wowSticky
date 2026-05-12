@@ -59,5 +59,10 @@ public class DatabaseService
             );
             """;
         cmd.ExecuteNonQuery();
+
+        // Migration: add reminder columns if they don't exist
+        try { cmd.CommandText = "ALTER TABLE notes ADD COLUMN reminderEnabled INTEGER NOT NULL DEFAULT 0"; cmd.ExecuteNonQuery(); } catch { }
+        try { cmd.CommandText = "ALTER TABLE notes ADD COLUMN reminderNextAt TEXT"; cmd.ExecuteNonQuery(); } catch { }
+        try { cmd.CommandText = "ALTER TABLE notes ADD COLUMN reminderInterval TEXT NOT NULL DEFAULT 'once'"; cmd.ExecuteNonQuery(); } catch { }
     }
 }

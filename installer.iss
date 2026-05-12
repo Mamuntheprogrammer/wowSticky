@@ -2,7 +2,7 @@
 ; Md. Abdullah Al Mamun
 
 #define MyAppName "WowSticky"
-#define MyAppVersion "1.1"
+#define MyAppVersion "2.0"
 #define MyAppIcon "app.ico"
 #define MyAppPublisher "Md. Abdullah Al Mamun"
 #define MyAppURL "https://github.com/Mamuntheprogrammer"
@@ -35,7 +35,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: autostart; Description: "Launch on Windows startup"; GroupDescription: "Startup options:"; Flags: checkedonce
 
 [Files]
-Source: "publish\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

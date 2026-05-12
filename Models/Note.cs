@@ -18,6 +18,9 @@ public class Note
     public bool Trashed { get; set; }
     public int FontSize { get; set; } = 14;
     public long ZIndex { get; set; }
+    public bool ReminderEnabled { get; set; }
+    public string? ReminderNextAt { get; set; }
+    public string ReminderInterval { get; set; } = "once";
     public string CreatedAt { get; set; } = DateTime.UtcNow.ToString("o");
     public string UpdatedAt { get; set; } = DateTime.UtcNow.ToString("o");
 }

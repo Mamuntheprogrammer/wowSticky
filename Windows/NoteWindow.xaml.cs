@@ -181,6 +181,7 @@ public partial class NoteWindow : Window
         AlwaysOnTopBtn.Foreground = _isAlwaysOnTop
             ? new SolidColorBrush(WinColor.FromRgb(255, 224, 102))
             : fgBrush;
+        UpdateReminderButtonState();
     }
 
     private void UpdateTitlePlaceholder()
@@ -339,8 +340,142 @@ public partial class NoteWindow : Window
 
     private void Close_Click(object sender, RoutedEventArgs e)
     {
+        ReminderPanel.Visibility = Visibility.Collapsed;
         Dismissed?.Invoke(_note.Id);
         Hide();
+    }
+
+    // ─── Reminder ─────────────────────────────────────────────
+
+    private void Reminder_Click(object sender, RoutedEventArgs e)
+    {
+        ReminderPanel.Visibility = ReminderPanel.Visibility == Visibility.Visible
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+
+        if (ReminderPanel.Visibility == Visibility.Collapsed) return;
+
+        if (_note.ReminderEnabled && !string.IsNullOrEmpty(_note.ReminderNextAt)
+            && DateTime.TryParse(_note.ReminderNextAt, out var nextAt))
+        {
+            ReminderDatePicker.SelectedDate = nextAt.Date;
+            ReminderHourBox.Text = nextAt.ToString("h");
+            ReminderMinuteBox.Text = nextAt.ToString("mm");
+            ReminderAmPmCombo.SelectedIndex = nextAt.ToString("tt") == "PM" ? 1 : 0;
+            SelectInterval(_note.ReminderInterval);
+            RemoveReminderBtn.IsEnabled = true;
+        }
+        else
+        {
+            ReminderDatePicker.SelectedDate = DateTime.Today;
+            var def = DateTime.Now.AddHours(1);
+            ReminderHourBox.Text = def.ToString("h");
+            ReminderMinuteBox.Text = def.ToString("mm");
+            ReminderAmPmCombo.SelectedIndex = def.ToString("tt") == "PM" ? 1 : 0;
+            ReminderIntervalCombo.SelectedIndex = 0;
+            RemoveReminderBtn.IsEnabled = false;
+        }
+
+        ReminderDatePicker.Focus();
+    }
+
+    private TimeOnly? ParseReminderTime()
+    {
+        if (!int.TryParse(ReminderHourBox.Text, out var hour) || hour < 1 || hour > 12)
+        {
+            System.Windows.MessageBox.Show("Enter a valid hour (1-12).");
+            return null;
+        }
+        if (!int.TryParse(ReminderMinuteBox.Text, out var min) || min < 0 || min > 59)
+        {
+            System.Windows.MessageBox.Show("Enter a valid minute (0-59).");
+            return null;
+        }
+        if (ReminderAmPmCombo.SelectedItem is ComboBoxItem ampm)
+        {
+            if (ampm.Content.ToString() == "PM" && hour != 12) hour += 12;
+            else if (ampm.Content.ToString() == "AM" && hour == 12) hour = 0;
+        }
+        return new TimeOnly(hour, min);
+    }
+
+    private void SetReminder_Click(object sender, RoutedEventArgs e)
+    {
+        var date = ReminderDatePicker.SelectedDate;
+        if (date == null) return;
+
+        var time = ParseReminderTime();
+        if (time == null) return;
+
+        var interval = GetSelectedIntervalTag();
+        var dateTime = date.Value.Date + time.Value.ToTimeSpan();
+
+        if (interval == "firstday")
+            dateTime = new DateTime(dateTime.Year, dateTime.Month, 1).Date + dateTime.TimeOfDay;
+        else if (interval == "lastday")
+            dateTime = new DateTime(dateTime.Year, dateTime.Month, 1).AddMonths(1).AddDays(-1).Date + dateTime.TimeOfDay;
+
+        if (dateTime <= DateTime.Now)
+        {
+            var next = Services.ReminderService.ComputeNextReminder(interval, dateTime);
+            if (next.HasValue) dateTime = next.Value;
+        }
+
+        _note.ReminderEnabled = true;
+        _note.ReminderNextAt = dateTime.ToString("o");
+        _note.ReminderInterval = interval;
+        _noteService.UpdateReminder(_note.Id, true, dateTime.ToString("o"), interval);
+
+        UpdateReminderButtonState();
+        ReminderPanel.Visibility = Visibility.Collapsed;
+    }
+
+    private void RemoveReminder_Click(object sender, RoutedEventArgs e)
+    {
+        _note.ReminderEnabled = false;
+        _note.ReminderNextAt = null;
+        _note.ReminderInterval = "once";
+        _noteService.RemoveReminder(_note.Id);
+
+        UpdateReminderButtonState();
+        ReminderPanel.Visibility = Visibility.Collapsed;
+    }
+
+    private string GetSelectedIntervalTag()
+    {
+        if (ReminderIntervalCombo.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+            return tag;
+        return "once";
+    }
+
+    private void SelectInterval(string interval)
+    {
+        foreach (ComboBoxItem item in ReminderIntervalCombo.Items)
+        {
+            if (item.Tag is string tag && tag == interval)
+            {
+                ReminderIntervalCombo.SelectedItem = item;
+                return;
+            }
+        }
+        ReminderIntervalCombo.SelectedIndex = 0;
+    }
+
+    private void UpdateReminderButtonState()
+    {
+        if (_note.ReminderEnabled && _note.ReminderNextAt != null
+            && DateTime.TryParse(_note.ReminderNextAt, out var nextAt))
+        {
+            ReminderBtn.Content = "🔔";
+            ReminderBtn.Opacity = 1.0;
+            ReminderBtn.ToolTip = $"Reminder: {nextAt:g} ({_note.ReminderInterval})";
+        }
+        else
+        {
+            ReminderBtn.Content = "🔔";
+            ReminderBtn.Opacity = 0.7;
+            ReminderBtn.ToolTip = "Set reminder";
+        }
     }
 
     private void Trash_Click(object sender, RoutedEventArgs e)

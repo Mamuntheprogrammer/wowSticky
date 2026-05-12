@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Media;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
@@ -16,12 +17,15 @@ public partial class App
     private DatabaseService _db = null!;
     private FolderService _folderService = null!;
     private NoteService _noteService = null!;
+    private ReminderService _reminderService = null!;
     private ExplorerWatcher _explorerWatcher = null!;
     private System.Windows.Forms.NotifyIcon _trayIcon = null!;
     private System.Windows.Forms.ContextMenuStrip _trayMenu = null!;
 
     private readonly Dictionary<string, NoteWindow> _noteWindows = new();
+    private readonly Dictionary<string, ReminderWindow> _reminderWindows = new();
     private readonly HashSet<string> _dismissedNoteIds = new();
+    private readonly HashSet<string> _reminderActiveNoteIds = new();
     private Folder? _currentFolder;
     private EventWaitHandle _showEvent = null!;
     private HotkeyMessageWindow _hotkeyWnd = null!;
@@ -40,6 +44,18 @@ public partial class App
             return;
         }
 
+        DispatcherUnhandledException += (_, e) =>
+        {
+            File.AppendAllText(Path.Combine(AppDataDir, "error.log"),
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] UI: {e.Exception}\n");
+            e.Handled = true;
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            File.AppendAllText(Path.Combine(AppDataDir, "error.log"),
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] FATAL: {e.ExceptionObject}\n");
+        };
+
         try
         {
             Directory.CreateDirectory(AppDataDir);
@@ -50,6 +66,9 @@ public partial class App
 
             SeedIfEmpty();
             CreateTrayIcon();
+
+            _reminderService = new ReminderService(_noteService);
+            _reminderService.Start(OnReminderTriggered);
 
             _explorerWatcher = new ExplorerWatcher();
             _explorerWatcher.FolderActivated += OnFolderActivated;
@@ -253,6 +272,35 @@ public partial class App
         new Windows.AboutWindow().ShowDialog();
     }
 
+    // ─── Reminder ─────────────────────────────────────────────
+
+    private void OnReminderTriggered(Note note)
+    {
+        _dismissedNoteIds.Remove(note.Id);
+        _reminderActiveNoteIds.Add(note.Id);
+
+        if (_reminderWindows.TryGetValue(note.Id, out var existing))
+        {
+            existing.Topmost = true;
+            existing.Show();
+            existing.Focus();
+            return;
+        }
+
+        var folder = _folderService.GetById(note.FolderId);
+        var folderName = folder?.Name ?? "Unknown";
+        var popup = new ReminderWindow(note, folderName);
+        popup.Dismissed += OnReminderDismissed;
+        popup.Show();
+        _reminderWindows[note.Id] = popup;
+        popup.Closed += (_, _) => _reminderWindows.Remove(note.Id);
+    }
+
+    private void OnReminderDismissed(string noteId)
+    {
+        _reminderActiveNoteIds.Remove(noteId);
+    }
+
     // ─── Folder Events ────────────────────────────────────────
 
     private void OnFolderActivated(string path, IntPtr hwnd)
@@ -294,7 +342,7 @@ public partial class App
         var ids = notes.Select(n => n.Id).ToHashSet();
 
         foreach (var w in _noteWindows.Values)
-            if (!ids.Contains(w.NoteId))
+            if (!ids.Contains(w.NoteId) && !_reminderActiveNoteIds.Contains(w.NoteId))
                 w.Hide();
 
         foreach (var note in notes)
@@ -318,7 +366,13 @@ public partial class App
         }
     }
 
-    private void OnNoteDismissed(string id) => _dismissedNoteIds.Add(id);
+    private void OnNoteDismissed(string id)
+    {
+        _dismissedNoteIds.Add(id);
+        _reminderActiveNoteIds.Remove(id);
+        if (_reminderWindows.TryGetValue(id, out var rw))
+            rw.Close();
+    }
 
     private void ShowAllNotes()
     {
@@ -329,7 +383,9 @@ public partial class App
     private void HideAllNotes()
     {
         SaveAllNotePositions();
-        foreach (var w in _noteWindows.Values) w.Hide();
+        foreach (var w in _noteWindows.Values)
+            if (!_reminderActiveNoteIds.Contains(w.NoteId))
+                w.Hide();
     }
 
     private void CreateNewNote()
@@ -348,11 +404,14 @@ public partial class App
     private void ShutdownApp()
     {
         _stopping = true;
+        _reminderService.Stop();
         _explorerWatcher.Dispose();
         _trayIcon.Visible = false;
         _trayIcon.Dispose();
         foreach (var w in _noteWindows.Values) w.Close();
         _noteWindows.Clear();
+        foreach (var w in _reminderWindows.Values) w.Close();
+        _reminderWindows.Clear();
         UnregisterHotKey(_hotkeyWnd.Handle, 1);
         _hotkeyWnd.DestroyHandle();
         _showEvent?.Dispose();
@@ -363,6 +422,7 @@ public partial class App
     protected override void OnExit(ExitEventArgs e)
     {
         _stopping = true;
+        _reminderService?.Stop();
         _explorerWatcher?.Dispose();
         _trayIcon?.Dispose();
         _showEvent?.Dispose();

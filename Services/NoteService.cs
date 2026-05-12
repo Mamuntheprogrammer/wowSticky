@@ -200,6 +200,50 @@ public class NoteService
         cmd.ExecuteNonQuery();
     }
 
+    // ─── Reminder Methods ─────────────────────────────────────
+
+    public List<Note> GetReminders()
+    {
+        using var conn = _db.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT * FROM notes WHERE reminderEnabled = 1 AND reminderNextAt IS NOT NULL AND reminderNextAt != ''";
+        return ReadNotes(cmd);
+    }
+
+    public void UpdateReminder(string id, bool enabled, string? nextAt, string interval)
+    {
+        using var conn = _db.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE notes SET reminderEnabled = @enabled, reminderNextAt = @nextAt, reminderInterval = @interval, updatedAt = @updatedAt WHERE id = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@enabled", enabled ? 1 : 0);
+        cmd.Parameters.AddWithValue("@nextAt", nextAt ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@interval", interval);
+        cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow.ToString("o"));
+        cmd.ExecuteNonQuery();
+    }
+
+    public void UpdateReminderNextAt(string id, string? nextAt)
+    {
+        using var conn = _db.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE notes SET reminderNextAt = @nextAt, updatedAt = @updatedAt WHERE id = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@nextAt", nextAt ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow.ToString("o"));
+        cmd.ExecuteNonQuery();
+    }
+
+    public void RemoveReminder(string id)
+    {
+        using var conn = _db.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE notes SET reminderEnabled = 0, reminderNextAt = NULL, reminderInterval = 'once', updatedAt = @updatedAt WHERE id = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow.ToString("o"));
+        cmd.ExecuteNonQuery();
+    }
+
     private static List<Note> ReadNotes(SqliteCommand cmd)
     {
         var list = new List<Note>();
@@ -225,7 +269,10 @@ public class NoteService
                 FontSize = reader.GetInt32(14),
                 ZIndex = reader.GetInt64(15),
                 CreatedAt = reader.GetString(16),
-                UpdatedAt = reader.GetString(17)
+                UpdatedAt = reader.GetString(17),
+                ReminderEnabled = reader.FieldCount > 18 && reader.GetInt32(18) == 1,
+                ReminderNextAt = reader.FieldCount > 19 && !reader.IsDBNull(19) ? reader.GetString(19) : null,
+                ReminderInterval = reader.FieldCount > 20 && !reader.IsDBNull(20) ? reader.GetString(20) : "once"
             });
         }
         return list;
