@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+
+    <!-- Developer Info -->
+    <Company>Md. Abdullah Al Mamun</Company>
+    <Product>WowSticky</Product>
+    <Description>Sticky notes that follow you across folders in Windows Explorer</Description>
+    <Copyright>Copyright © Md. Abdullah Al Mamun</Copyright>
+    <PackageProjectUrl>https://github.com/Mamuntheprogrammer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Mamuntheprogrammer/WowSticky</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Md. Abdullah Al Mamun</Authors>
+
+    <!-- Size optimizations -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="icons\Square44x44Logo.targetsize-32.png" />
+  </ItemGroup>
+
+</Project>

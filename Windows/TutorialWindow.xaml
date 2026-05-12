@@ -1,0 +1,142 @@
+<Window x:Class="WowSticky.Windows.TutorialWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" Topmost="True"
+        Width="420" Height="500" WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Border CornerRadius="16" Background="#1A1A2E"
+            BorderThickness="1" BorderBrush="#2A2A4E"
+            Padding="28,24">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="32" Opacity="0.5"
+                              ShadowDepth="6" Direction="315" Color="#000000"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header title -->
+            <TextBlock Name="TitleText" Grid.Row="0"
+                       FontSize="20" FontWeight="Bold"
+                       Foreground="#FFFFFF" TextAlignment="Center"
+                       Margin="0,0,0,16"/>
+
+            <!-- Step content -->
+            <Border Name="Card" Grid.Row="1"
+                    Background="#14FFFFFF" CornerRadius="12"
+                    Padding="20,18" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Name="IconText" FontSize="36"
+                               TextAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Name="DescText" FontSize="13"
+                               Foreground="#C0C0D8" TextWrapping="Wrap"
+                               TextAlignment="Center" LineHeight="20"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Step dots -->
+            <ItemsControl Name="DotsBar" Grid.Row="2"
+                          Margin="0,0,0,12"
+                          HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="8" Height="8" Margin="4,0"
+                                 Fill="{Binding}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Navigation -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Name="PrevBtn" Grid.Column="0"
+                        Content="←  Back" FontSize="13"
+                        Foreground="#8888AA" Background="Transparent"
+                        BorderThickness="0" Cursor="Hand"
+                        Click="Prev_Click" Padding="12,8">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Name="Bd" Background="{TemplateBinding Background}"
+                                    CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <TextBlock Name="CounterText" Grid.Column="1"
+                           Text="1 / 8" FontSize="12"
+                           Foreground="#666688"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+
+                <Button Name="NextBtn" Grid.Column="2"
+                        FontSize="13" FontWeight="SemiBold"
+                        Foreground="#FFFFFF" Cursor="Hand"
+                        Click="Next_Click" Padding="16,8">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Name="Bd" CornerRadius="8"
+                                    Padding="{TemplateBinding Padding}">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#6366F1" Offset="0.0"/>
+                                        <GradientStop Color="#8B5CF6" Offset="1.0"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <!-- Skip -->
+            <Button Name="SkipBtn" Grid.Row="4"
+                    Content="Skip tutorial" FontSize="11"
+                    Foreground="#555577" Background="Transparent"
+                    BorderThickness="0" Cursor="Hand"
+                    Click="Skip_Click" HorizontalAlignment="Center">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="Bd" Background="Transparent"
+                                CornerRadius="6" Padding="10,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+    </Border>
+</Window>
